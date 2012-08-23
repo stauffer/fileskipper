@@ -51,11 +51,12 @@ class Vars:
   maxrows = 1
   maxcols = 5
   fileslist = []
+  fileslistfullpath = []
   tooltipslist = []
   pattern = '*'
   extensions = 'py, pyc, pyw'
-  launchlist = ['python2 ', 'python3 ','idle', 'gedit ', 'sublime']
-  sublimeoptions = ['sublime', 'sbl']
+  launchlist = ['python2 ', 'python3 ','idle ', 'gedit ', 'sublime ', 'new']
+  sublimeoptions = ['sublime ', 'sbl ']
   idleoptions = ['/usr/bin/idle-python2.7']
   launcher = ''
   patternbox = gtk.Entry()
@@ -76,6 +77,7 @@ class Mainwin:
     self.table.destroy()
     Vars.fileslist = [] #reset the list to blank
     Vars.tooltipslist = [] #reset the list to blank
+    Vars.fileslistfullpath = []
     #reload the gui based on the user imputted wildcard and extensions
     #read the search criteria entry box
     #read the extension entry box
@@ -83,12 +85,12 @@ class Mainwin:
     print Vars.pattern
     Vars.extensions = Vars.extensionsbox.get_text()
     print Vars.extensions
-    self.setArgs()
+    #self.setArgs()
     self.readthedirectory()
-    
+    '''
     for x in range(len(Vars.fileslist)):
       Vars.fileslist[x] += str(Vars.sysargs)
-
+    '''
     self.setmax()
     self.makeTable()
 
@@ -120,8 +122,9 @@ class Mainwin:
     self.table.show()
 
   def launchbutton(self, widget, x):
-    print('Launching %s (%s)...' %(Vars.fileslist[x], x))
-    os.system(Vars.launcher + str(Vars.fileslist[x]))
+    self.setArgs()
+    print('Launching %s (%s - %s)...' %(Vars.fileslist[x], x, Vars.fileslistfullpath[x]))
+    os.system(Vars.launcher + str(Vars.fileslistfullpath[x]) + Vars.sysargs)
 
   def setmax(self):
     print('setmax()')
@@ -176,6 +179,7 @@ class Mainwin:
           print('\t- %s' %(fpath))
           mdate = datetime.fromtimestamp(float(mdate)).strftime('%y-%m-%d %H:%M:%S')
           fullfpath = os.path.realpath(fpath)
+          Vars.fileslistfullpath.append(fullfpath)
           size = os.path.getsize(fpath)
           tooltiptext = fullfpath + '\n' + 'Last Modified: ' + mdate + '\t' + 'Size: ' + str(size)
           Vars.tooltipslist.append(tooltiptext)
@@ -199,8 +203,13 @@ class Mainwin:
     print('Found %s files.' %(len(Vars.fileslist)))
 
   def setArgs(self):
-    Vars.sysargs = ' ' + str(self.sysargbox.get_text())
-    print(len(Vars.sysargs)),
+    args = str(self.sysargbox.get_text()).split(' ')
+    Vars.sysargs = ''
+    for x in range(len(args)):
+      Vars.sysargs += ' \''
+      Vars.sysargs += args[x]
+      Vars.sysargs += '\''
+    print(Vars.sysargs)
 
   def changeFolder(self, widget):
     print('changeFolder()...........')
