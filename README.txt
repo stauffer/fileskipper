@@ -10,9 +10,11 @@ The default is to look for python scripts in the installed directory and build a
 By default Python2 is the executor but options for Python3, gedit, idle and sublime.
 
 Things to remember:
-Written in and for Linux - any cross platform functionality is purely accidental (and I have no intention of building
+-Written in and for Linux - any cross platform functionality is purely accidental (and I have no intention of building
 that in but am open to someone else doing that).
-Separate all file extensions with commas only.
+-Separate all file extensions with commas only.
+-System arguments are basic; string will be split by spaces and passed to the program in quotes
+(i.e. python myscript.py 'arg1' 'arg2') 
 
 Please feel free to give feedback.
 
