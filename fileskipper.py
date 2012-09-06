@@ -43,11 +43,12 @@ TODO
 import time
 from datetime import datetime
 import os, glob, fnmatch
-import pygtk, gtk
+import pygtk, gtk, sys
 pygtk.require('2.0')
 
 class Vars:
-  path = os.getcwd()
+  #path = os.getcwd()
+  path = sys.path[0]
   maxrows = 1
   maxcols = 5
   fileslist = []
@@ -56,7 +57,7 @@ class Vars:
   pattern = '*'
   extensions = 'py, pyc, pyw'
   launchlist = ['python2 ', 'python3 ','idle ', 'gedit ', 'sublime ', 'new']
-  sublimeoptions = ['sublime ', 'sbl ']
+  sublimeoptions = ['sublime', 'sbl','subl']
   idleoptions = ['/usr/bin/idle-python2.7']
   launcher = ''
   patternbox = gtk.Entry()
@@ -121,9 +122,32 @@ class Mainwin:
             indx += 1
     self.table.show()
 
+  ## Function modified from: http://stackoverflow.com/a/377028 ##
+  def is_tool(self,program):
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+
+    return False
+
   def launchbutton(self, widget, x):
     self.setArgs()
     print('Launching %s (%s - %s)...' %(Vars.fileslist[x], x, Vars.fileslistfullpath[x]))
+    if Vars.launcher == "sublime ":
+      for count in range(0,len(Vars.sublimeoptions)):
+        if self.is_tool(Vars.sublimeoptions[count]) != False:
+          print("Using %s to run Sublime" % Vars.sublimeoptions[count])
+          Vars.launcher = Vars.sublimeoptions[count] + ' '
+          break
     os.system(Vars.launcher + str(Vars.fileslistfullpath[x]) + Vars.sysargs)
 
   def setmax(self):
@@ -203,12 +227,13 @@ class Mainwin:
     print('Found %s files.' %(len(Vars.fileslist)))
 
   def setArgs(self):
-    args = str(self.sysargbox.get_text()).split(' ')
     Vars.sysargs = ''
-    for x in range(len(args)):
-      Vars.sysargs += ' \''
-      Vars.sysargs += args[x]
-      Vars.sysargs += '\''
+    if self.sysargbox.get_text() != "":
+      args = self.sysargbox.get_text().split(' ')
+      for x in range(len(args)):
+        Vars.sysargs += ' \''
+        Vars.sysargs += args[x]
+        Vars.sysargs += '\''
     print(Vars.sysargs)
 
   def changeFolder(self, widget):
