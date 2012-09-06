@@ -29,7 +29,8 @@ Jeff Stauffer
 Tips and Tricks
 ------------
 
-**Access fileskipper.py from anywhere in the file tree and avoid typing "python2 fileskipper.py" every time.** Add the following to your `~/.bashrc` file (`~/.bash_profile` for Mac and Cygwin users):
+**Access fileskipper.py from anywhere in the file tree and avoid typing "python2 fileskipper.py" every time.**
+Add the following to your `~/.bashrc` file (`~/.bash_profile` for Mac and Cygwin users):
 
 <pre>
 alias f='python2 /path/to/fileskipper.py'
