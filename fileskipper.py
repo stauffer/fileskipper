@@ -43,7 +43,7 @@ TODO
 import time
 from datetime import datetime
 import os, glob, fnmatch
-import pygtk, gtk, sys
+import pygtk, gtk, sys,subprocess
 pygtk.require('2.0')
 
 class Vars:
@@ -56,7 +56,7 @@ class Vars:
   tooltipslist = []
   pattern = '*'
   extensions = 'py, pyc, pyw'
-  launchlist = ['python2 ', 'python3 ','idle ', 'gedit ', 'sublime ', 'new']
+  launchlist = ['python2', 'python3','idle', 'gedit', 'sublime', 'new']
   sublimeoptions = ['sublime', 'sbl','subl']
   idleoptions = ['/usr/bin/idle-python2.7']
   launcher = ''
@@ -142,13 +142,17 @@ class Mainwin:
   def launchbutton(self, widget, x):
     self.setArgs()
     print('Launching %s (%s - %s)...' %(Vars.fileslist[x], x, Vars.fileslistfullpath[x]))
-    if Vars.launcher == "sublime ":
+    if Vars.launcher == "sublime":
       for count in range(0,len(Vars.sublimeoptions)):
         if self.is_tool(Vars.sublimeoptions[count]) != False:
           print("Using %s to run Sublime" % Vars.sublimeoptions[count])
-          Vars.launcher = Vars.sublimeoptions[count] + ' '
+          Vars.launcher = Vars.sublimeoptions[count]
           break
-    os.system(Vars.launcher + str(Vars.fileslistfullpath[x]) + Vars.sysargs)
+    #os.system(Vars.launcher + str(Vars.fileslistfullpath[x]) + Vars.sysargs)
+    if Vars.sysargs == "":
+      p = subprocess.Popen((Vars.launcher, str(Vars.fileslistfullpath[x])))
+    else:
+      p = subprocess.Popen((Vars.launcher, str(Vars.fileslistfullpath[x]),Vars.sysargs))
 
   def setmax(self):
     print('setmax()')
