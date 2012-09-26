@@ -1,13 +1,18 @@
 Fileskipper
 ==============
 
-fileskipper is a quick file search/launcher.
+fileskipper is a quick and simple file navigator/launcher. 
 
-Recently, while working on a project involving several different Python scripts, I had the need to quickly launch the different scripts either directly with Python or in an editor... and Fileskipper was born.
+It's purpose is to display the related files in a project in one spot for quick launching, testing or editing.
 
-Place fileskipper.py in the folder you are working in and run it; it will find all python files in that directory as well as in any subdirectories and build a grid of buttons. You can then open the file for editing or with Python.
+Fileskipper will search for all files in the current working directory (including all subfolders) of the specified file type(s) and create launch buttons for them. Select how you wish to launch the file (i.e. python, php or a text editor), add any required system arguments and click the file's launch button. Tooltips for each launch button shows the filepath, size and last modified date. You can change the working directory or reload the files at any time.
 
-The default is to look for python scripts in the installed directory and build a table of executable buttons. By default Python2 is the executor but options for Python3, gedit, idle and sublime.
+Place fileskipper.py in the folder you are working in and run it; it will find all python files in that directory as well as in any subdirectories and build a grid of buttons. You can then open the file for editing or with Python. See 'Tips and tricks' below for an even better solution.
+
+By default fileskipper looks for python and text files and launches with Python2.
+
+Please enjoy and we hope you find fileskipper as handy as we do.
+
 
 Things to remember:
 * Written in and for Linux - any cross platform functionality is purely accidental (and I have no intention of building that in but am open to someone else doing that).

@@ -4,7 +4,7 @@ __author__ = "Jeff Stauffer"
 __copyright__ = "2012 Jeff Stauffer"
 __license__ = "GPLv3"
 __title__ = "fileskipper"
-version = '0.2.2'
+version = '0.2.4'
 
 #    Built for python 2.7
 
@@ -33,11 +33,13 @@ Written exclusively using the fine editor Nano
 Special thanks to Dave Umrysh for thoughts, ideas, assistance, etc. You can find
 Dave's software at www.umrysh.com
 
+0.2.4
+ - code clean ups
+ - Lately Dave has added a lot of bug fixes and updates
+ - Fixed bug in system arguments being passed as string of strings
+
 TODO
- - Make the GUI
- - Look for icons with the same(ish) name and show the icon
- - Tooltip from helpfile in script if any
- - Look for sys.argvs if any
+ - use entry box to allow searching for specific file names; use wildcards
 '''
 
 import time
@@ -47,7 +49,6 @@ import pygtk, gtk, sys,subprocess
 pygtk.require('2.0')
 
 class Vars:
-  #path = os.getcwd()
   path = sys.path[0]
   maxrows = 1
   maxcols = 5
@@ -55,8 +56,8 @@ class Vars:
   fileslistfullpath = []
   tooltipslist = []
   pattern = '*'
-  extensions = 'py, pyc, pyw'
-  launchlist = ['python2', 'python3','idle', 'gedit', 'sublime', 'new']
+  extensions = 'py, php, txt'
+  launchlist = ['python2', 'python3','idle', 'gedit', 'sublime', 'php', 'new']
   sublimeoptions = ['sublime', 'sbl','subl']
   idleoptions = ['/usr/bin/idle-python2.7']
   launcher = ''
@@ -88,10 +89,6 @@ class Mainwin:
     print Vars.extensions
     #self.setArgs()
     self.readthedirectory()
-    '''
-    for x in range(len(Vars.fileslist)):
-      Vars.fileslist[x] += str(Vars.sysargs)
-    '''
     self.setmax()
     self.makeTable()
 
@@ -138,21 +135,6 @@ class Mainwin:
                 return exe_file
 
     return False
-
-  def launchbutton(self, widget, x):
-    self.setArgs()
-    print('Launching %s (%s - %s)...' %(Vars.fileslist[x], x, Vars.fileslistfullpath[x]))
-    if Vars.launcher == "sublime":
-      for count in range(0,len(Vars.sublimeoptions)):
-        if self.is_tool(Vars.sublimeoptions[count]) != False:
-          print("Using %s to run Sublime" % Vars.sublimeoptions[count])
-          Vars.launcher = Vars.sublimeoptions[count]
-          break
-    #os.system(Vars.launcher + str(Vars.fileslistfullpath[x]) + Vars.sysargs)
-    if Vars.sysargs == "":
-      p = subprocess.Popen((Vars.launcher, str(Vars.fileslistfullpath[x])))
-    else:
-      p = subprocess.Popen((Vars.launcher, str(Vars.fileslistfullpath[x]),Vars.sysargs))
 
   def setmax(self):
     print('setmax()')
@@ -212,33 +194,35 @@ class Mainwin:
           tooltiptext = fullfpath + '\n' + 'Last Modified: ' + mdate + '\t' + 'Size: ' + str(size)
           Vars.tooltipslist.append(tooltiptext)
 
-  def locate(filetype): ##########NOT USED################
-    for path, dirs, files in os.walk(os.path.abspath(Vars.path)):
-        for filename in fnmatch.filter(files, x):
-          fname = os.path.join(Vars.path, filename)
-          Vars.fileslist.append(fname)
-          print fname
-          fpath = os.path.join(x[0], fname)
-          print('\t- %s' %(fpath))
-          mdate = os.path.getmtime(fpath)
-          print mdate
-          mdate = datetime.fromtimestamp(float(mdate)).strftime('%y-%m-%d %H:%M:%S')
-          fullfpath = os.path.realpath(fpath)
-          size = os.path.getsize(fpath)
-          tooltiptext = fullfpath + '\n' + 'Last Modified: ' + mdate + '\t' + 'Size: ' + str(size)
-          Vars.tooltipslist.append(tooltiptext)
-            #yield os.path.join(path, filename)
-    print('Found %s files.' %(len(Vars.fileslist)))
+  def launchbutton(self, widget, x):
+    self.setArgs()
+    print('Launching %s (%s - %s)...' %(Vars.fileslist[x], x, Vars.fileslistfullpath[x]))
+    if Vars.launcher == "sublime":
+      for count in range(0,len(Vars.sublimeoptions)):
+        if self.is_tool(Vars.sublimeoptions[count]) != False:
+          print("Using %s to run Sublime" % Vars.sublimeoptions[count])
+          Vars.launcher = Vars.sublimeoptions[count]
+          break
+    #os.system(Vars.launcher + str(Vars.fileslistfullpath[x]) + Vars.sysargs)
+    
+    if Vars.sysargs == "":
+      p = subprocess.Popen((Vars.launcher, str(Vars.fileslistfullpath[x])))
+    else:
+      ### Make a big-eyed long string and split it for the sysarg call
+      popenstring = str(Vars.launcher) + ' ' + str(Vars.fileslistfullpath[x])
+      for y in range(len(Vars.sysargs)):
+        popenstring = popenstring + ' '+ Vars.sysargs[y]
+      Vars.sysargs = popenstring.split(' ')
+      print('subprocess.Popen(%s)' %(Vars.sysargs))
+      p = subprocess.Popen(Vars.sysargs)
+      #p = subprocess.Popen((Vars.launcher, str(Vars.fileslistfullpath[x]), Vars.sysargs))
 
   def setArgs(self):
     Vars.sysargs = ''
     if self.sysargbox.get_text() != "":
       args = self.sysargbox.get_text().split(' ')
-      for x in range(len(args)):
-        Vars.sysargs += ' \''
-        Vars.sysargs += args[x]
-        Vars.sysargs += '\''
-    print(Vars.sysargs)
+      Vars.sysargs = args
+    print('fileskipper.py---- Vars.sysargs: %s' %(Vars.sysargs))
 
   def changeFolder(self, widget):
     print('changeFolder()...........')
