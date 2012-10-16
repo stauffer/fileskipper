@@ -180,9 +180,13 @@ class Mainwin:
       print('Found %s files.' %(len(Vars.fileslist)))
 
   def locatefiles(self, filetype, extensions):
+    if Vars.pattern == "":
+      Vars.pattern = "*"
+      Vars.patternbox.set_text("*")
+      
     for x in os.walk(Vars.path):
       for fname in x[2]:
-        if len(fname.split('.')) > 1 and fname.split('.')[1] == filetype: # and fnmatch.filter(__title__, fname.split('.')[0]):#in extensions:
+        if len(fname.split('.')) > 1 and fname.split('.')[1] == filetype and  fnmatch.fnmatch(fname.split('.')[0],Vars.pattern):#in extensions:
           Vars.fileslist.append(fname)
           fpath = os.path.join(x[0], fname)
           mdate = os.path.getmtime(fpath)
