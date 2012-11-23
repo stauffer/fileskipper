@@ -4,7 +4,7 @@ __author__ = "Jeff Stauffer"
 __copyright__ = "2012 Jeff Stauffer"
 __license__ = "GPLv3"
 __title__ = "fileskipper"
-version = '0.2.5'
+version = '1.0'
 
 #    Built for python 2.7
 
@@ -42,9 +42,11 @@ Dave's software at www.umrysh.com
      - there was a bug which only allowed one system argument to be passed
      - I fixed that until I tried to launch from a file path where one folder had a space in it
      - It now seems to properly launch multiple system arguments without issue
+1.0
+ - Dave Umrysh finished feature to search by file name and to allow decimals in the file name (search version number)
 
 TODO
- - use entry box to allow searching for specific file names; use wildcards
+ - 
 '''
 
 import time
