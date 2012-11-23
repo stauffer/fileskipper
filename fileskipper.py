@@ -4,7 +4,7 @@ __author__ = "Jeff Stauffer"
 __copyright__ = "2012 Jeff Stauffer"
 __license__ = "GPLv3"
 __title__ = "fileskipper"
-version = '0.2.4'
+version = '0.2.5'
 
 #    Built for python 2.7
 
@@ -37,6 +37,11 @@ Dave's software at www.umrysh.com
  - code clean ups
  - Lately Dave has added a lot of bug fixes and updates
  - Fixed bug in system arguments being passed as string of strings
+0.2.5
+ - I think that I've fixed a bug in the system arguments
+     - there was a bug which only allowed one system argument to be passed
+     - I fixed that until I tried to launch from a file path where one folder had a space in it
+     - It now seems to properly launch multiple system arguments without issue
 
 TODO
  - use entry box to allow searching for specific file names; use wildcards
@@ -57,7 +62,7 @@ class Vars:
   tooltipslist = []
   pattern = '*'
   extensions = 'py, php, txt'
-  launchlist = ['python2', 'python3','idle', 'gedit', 'sublime', 'php', 'new']
+  launchlist = ['python2', 'python3','idle', 'gedit', 'sublime', 'php', 'default']
   sublimeoptions = ['sublime', 'sbl','subl']
   idleoptions = ['/usr/bin/idle-python2.7']
   launcher = ''
@@ -204,18 +209,26 @@ class Mainwin:
           Vars.launcher = Vars.sublimeoptions[count]
           break
     #os.system(Vars.launcher + str(Vars.fileslistfullpath[x]) + Vars.sysargs)
-    
+    elif Vars.launcher == "default":
+      os.system("gnome-open " + str(Vars.fileslistfullpath[x]))
     if Vars.sysargs == "":
       p = subprocess.Popen((Vars.launcher, str(Vars.fileslistfullpath[x])))
     else:
       ### Make a big-eyed long string and split it for the sysarg call
-      popenstring = str(Vars.launcher) + ' ' + str(Vars.fileslistfullpath[x])
+      print('------ sysargs ------')
+      print(Vars.sysargs)
+      popenstring = str(Vars.launcher) + "|" + str(Vars.fileslistfullpath[x])
       for y in range(len(Vars.sysargs)):
-        popenstring = popenstring + ' '+ Vars.sysargs[y]
-      Vars.sysargs = popenstring.split(' ')
-      print('subprocess.Popen(%s)' %(Vars.sysargs))
+        popenstring += '|' + Vars.sysargs[y] 
+      Vars.sysargs = list(popenstring.split('|'))
+      print('------ popenstring ------')
+      print(popenstring)
+      print('------------- sysargs string --------------')
+      print (Vars.sysargs)
       p = subprocess.Popen(Vars.sysargs)
-      #p = subprocess.Popen((Vars.launcher, str(Vars.fileslistfullpath[x]), Vars.sysargs))
+      print('-------------- Done  sysargs--------------')
+      #p = subprocess.Popen((Vars.launcher, str(Vars.fileslistfullpath[x]), popenstring))
+
 
   def setArgs(self):
     Vars.sysargs = ''
