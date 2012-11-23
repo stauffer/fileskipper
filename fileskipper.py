@@ -50,8 +50,20 @@ TODO
 import time
 from datetime import datetime
 import os, glob, fnmatch
-import pygtk, gtk, sys,subprocess
-pygtk.require('2.0')
+import sys,subprocess
+
+try:
+  import pygtk
+  pygtk.require('2.0')
+except ImportError:
+  print("pygtk not installed.")
+  pygtk = None
+
+try:
+  import gtk
+except ImportError:
+  print("gtk not installed.")
+  gtk = None
 
 class Vars:
   path = sys.path[0]
@@ -185,9 +197,14 @@ class Mainwin:
       print('Found %s files.' %(len(Vars.fileslist)))
 
   def locatefiles(self, filetype, extensions):
+    if Vars.pattern == "":
+      Vars.pattern = "*"
+      Vars.patternbox.set_text("*")
+      
     for x in os.walk(Vars.path):
       for fname in x[2]:
-        if len(fname.split('.')) > 1 and fname.split('.')[1] == filetype: # and fnmatch.filter(__title__, fname.split('.')[0]):#in extensions:
+        filenameArray = fname.split('.')
+        if len(fname.split('.')) > 1 and filenameArray[len(filenameArray)-1] == filetype and  fnmatch.fnmatch(fname[:-len(filenameArray[len(filenameArray)-1])],Vars.pattern):#in extensions:
           Vars.fileslist.append(fname)
           fpath = os.path.join(x[0], fname)
           mdate = os.path.getmtime(fpath)
@@ -249,7 +266,12 @@ class Mainwin:
     self.reloadClicked(True)
 
 
-  def __init__(self): #Make the GUI ##########################################################################
+  def __init__(self): #Make the GUI
+
+    # Check for Import Errors
+    if(pygtk == None or gtk == None):
+      sys.exit(1) 
+  ##########################################################################
     self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
     self.window.connect("delete_event", self.deleteEvent)
     self.window.set_default_size(350, 200)
