@@ -191,7 +191,7 @@ class Mainwin:
       for x in r:
         Vars.extensions = Vars.extensions.replace(x, '')
       extensions= Vars.extensions.split(',')
-      extensions.sort()
+      extensions = sorted(extensions, key=lambda s: s.lower())
       Vars.extensionsbox.set_text(Vars.extensions)
       for filetype in extensions:
         print('Searching for .%s files' %(filetype))
@@ -203,20 +203,32 @@ class Mainwin:
       Vars.pattern = "*"
       Vars.patternbox.set_text("*")
       
+
+    foundfilelist = []
     for x in os.walk(Vars.path):
       for fname in x[2]:
-        filenameArray = fname.split('.')
-        if len(fname.split('.')) > 1 and filenameArray[len(filenameArray)-1] == filetype and  fnmatch.fnmatch(fname[:-len(filenameArray[len(filenameArray)-1])],Vars.pattern):#in extensions:
-          Vars.fileslist.append(fname)
-          fpath = os.path.join(x[0], fname)
-          mdate = os.path.getmtime(fpath)
-          print('\t- %s' %(fpath))
-          mdate = datetime.fromtimestamp(float(mdate)).strftime('%y-%m-%d %H:%M:%S')
-          fullfpath = os.path.realpath(fpath)
-          Vars.fileslistfullpath.append(fullfpath)
-          size = os.path.getsize(fpath)
-          tooltiptext = fullfpath + '\n' + 'Last Modified: ' + mdate + '\t' + 'Size: ' + str(size)
-          Vars.tooltipslist.append(tooltiptext)
+        a = []
+        a.append(fname)
+        a.append(x[0])
+        foundfilelist.append(a)
+
+    foundfilelist.sort(key=lambda x: x[0].lower())
+
+    for x in foundfilelist:
+      fname = x[0]
+
+      filenameArray = fname.split('.')
+      if len(fname.split('.')) > 1 and filenameArray[len(filenameArray)-1] == filetype and  fnmatch.fnmatch(fname[:-len(filenameArray[len(filenameArray)-1])],Vars.pattern):#in extensions:
+        Vars.fileslist.append(fname)
+        fpath = os.path.join(x[1], fname)
+        mdate = os.path.getmtime(fpath)
+        print('\t- %s' %(fpath))
+        mdate = datetime.fromtimestamp(float(mdate)).strftime('%y-%m-%d %H:%M:%S')
+        fullfpath = os.path.realpath(fpath)
+        Vars.fileslistfullpath.append(fullfpath)
+        size = os.path.getsize(fpath)
+        tooltiptext = fullfpath + '\n' + 'Last Modified: ' + mdate + '\t' + 'Size: ' + str(size)
+        Vars.tooltipslist.append(tooltiptext)
 
   def launchbutton(self, widget, x):
     self.setArgs()
