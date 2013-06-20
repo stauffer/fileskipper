@@ -363,6 +363,10 @@ class Mainwin:
     self.window.show()
     self.window.show_all()
     self.vbox.show()
+
+    self.window.set_focus(Vars.patternbox)
+    Vars.patternbox.set_position(1)
+
     gtk.main()
 
     for x in Vars.fileslist:
